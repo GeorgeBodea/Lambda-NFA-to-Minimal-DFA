@@ -208,7 +208,7 @@ def conversie_nfa_in_dfa(automat_nfa, stare_initiala, l_finale, l_litere):
             retine += 1
     print("Starile finale (cu starile inlocuite): " + str(l_finale))
     print("Automatul DFA final (cu starile inlocuite): " + str(automat_dfa))
+    return automat_dfa, stare_initiala, l_finale, l_litere
 
-
-# automat_nfa, stare_initiala, l_finale, l_litere = {0: {'a': {0,1}, 'b': {}}, 1: {'a': {1}, 'b': {1,2}},2: {'a': {1}, 'b': {2}}}, 0, [2], ['a', 'b']
-# conversie_nfa_in_dfa(automat_nfa, stare_initiala,l_finale,l_litere)
+automat_nfa, stare_initiala, l_finale, l_litere = {0: {'a': {0,1}, 'b': {}}, 1: {'a': {1}, 'b': {1,2}},2: {'a': {1}, 'b': {2}}}, 0, [2], ['a', 'b']
+conversie_nfa_in_dfa(automat_nfa, stare_initiala,l_finale,l_litere)
