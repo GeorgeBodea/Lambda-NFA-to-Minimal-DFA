@@ -113,32 +113,27 @@ def conversie_lambda_nfa_in_nfa(nume_fisier_intrare):
 # automat_nfa,stare_initiala,l_finale,l_litere=conversie_lambda_nfa_in_nfa('laborator.txt')
 
 
-
-
 def conversie_nfa_in_dfa(automat_nfa, stare_initiala, l_finale, l_litere):
     print(automat_nfa)
     coada = [stare_initiala]
     v = [{stare_initiala}]
     automat_dfa = {}
 
-    retine=max(automat_nfa)+1 # Pentru pasul de redenumire
+    retine = max(automat_nfa) + 1  # Pentru pasul de redenumire
 
-    print('Coada: '+str(coada))
-    print('Vectorul de vizitari: '+str(v))
-    print('Automat DFA initial: '+str(automat_dfa))
-
+    print('Coada: ' + str(coada))
+    print('Vectorul de vizitari: ' + str(v))
 
     def transf_submultime(submultime):
-        cuvant=""
+        cuvant = ""
         for element in submultime:
-            cuvant+=str(element)
+            cuvant += str(element)
         return cuvant
-
 
     while len(coada) > 0:
         primul_element = coada[0]
         # Schita din DFA:
-        automat_dfa[primul_element]={}
+        automat_dfa[primul_element] = {}
         for litera in l_litere:
             automat_dfa[primul_element][litera] = set()
 
@@ -148,16 +143,16 @@ def conversie_nfa_in_dfa(automat_nfa, stare_initiala, l_finale, l_litere):
         # Caz special: daca starea noastra e cuvant, atunci e compusa, deci
         # trebuie sa ii aflam starile in care poate sa mearga. Punem tot in NFA starea si tranzitia ei
         if primul_element not in automat_nfa:
-                automat_nfa[primul_element] = {}
-                for litera in l_litere:
-                    automat_nfa[primul_element][litera] = set()
+            automat_nfa[primul_element] = {}
+            for litera in l_litere:
+                automat_nfa[primul_element][litera] = set()
 
-                for element in primul_element:
-                    int_element=int(element)
-                    #for int_element in automat_nfa:
-                    for litera in l_litere:
-                        for elemente in automat_nfa[int_element][litera]:
-                            automat_nfa[primul_element][litera].add(elemente)
+            for element in primul_element:
+                int_element = int(element)
+                # for int_element in automat_nfa:
+                for litera in l_litere:
+                    for elemente in automat_nfa[int_element][litera]:
+                        automat_nfa[primul_element][litera].add(elemente)
 
         # Acum intram in cele 2 cazuri, pentru fiecare stare:
         # Cazul 1: Avem mai multe stari prin care putem merge cu o litera
@@ -166,16 +161,16 @@ def conversie_nfa_in_dfa(automat_nfa, stare_initiala, l_finale, l_litere):
         for litera in l_litere:
             # Pentru fiece stare, fiece litera, luam setul respectiv
             sub_stare = automat_nfa[primul_element][litera]
-            if len(sub_stare) > 1: # Cazul 1
+            if len(sub_stare) > 1:  # Cazul 1
                 if sub_stare not in v and {transf_submultime(sub_stare)} not in v:
-                    sub_stare = transf_submultime(sub_stare) # Returneaza multime formata
-                                                             # dintr-un singur element
-                                                             # si anume "stare_tranz1+stare_tranz2..."
+                    sub_stare = transf_submultime(sub_stare)  # Returneaza multime formata
+                    # dintr-un singur element
+                    # si anume "stare_tranz1+stare_tranz2..."
                     coada.append(sub_stare)
                     automat_dfa[primul_element][litera] = {sub_stare}
                 else:
                     automat_dfa[primul_element][litera] = {transf_submultime(sub_stare)}
-            else: # Cazul 2
+            else:  # Cazul 2
                 if sub_stare not in v:
                     # Daca sub_starea nu e vizitata
                     # trebuie sa o parcurgem in dfa
@@ -189,31 +184,97 @@ def conversie_nfa_in_dfa(automat_nfa, stare_initiala, l_finale, l_litere):
                 automat_dfa[primul_element][litera] = sub_stare
         coada.pop(0)
 
-    print("Automatul DFA: " +str(automat_dfa))
+    print("Automatul DFA: " + str(automat_dfa))
 
     for element in automat_dfa:
-        if isinstance(element,str):
+        if isinstance(element, str):
             for atom in element:
-                atom=int(atom)
+                atom = int(atom)
                 if atom in l_finale:
                     l_finale.append(element)
 
-
     for element in automat_dfa:
-        if isinstance(element,str):
-            automat_dfa.update({retine:automat_dfa[element]})
+        if isinstance(element, str):
+            automat_dfa.update({retine: automat_dfa[element]})
             automat_dfa.pop(element)
             if element in l_finale:
                 l_finale.append(retine)
                 l_finale.remove(element)
             for orice_stare in automat_dfa:
                 for orice_litera in l_litere:
-                    if automat_dfa[orice_stare][orice_litera]=={element}:
+                    if automat_dfa[orice_stare][orice_litera] == {element}:
                         automat_dfa[orice_stare][orice_litera].pop()
                         automat_dfa[orice_stare][orice_litera].add(retine)
             retine += 1
     print("Starile finale (cu starile inlocuite): " + str(l_finale))
-    print("Automatul DFA final (cu starile inlocuite): "+ str(automat_dfa))
+    print("Automatul DFA final (cu starile inlocuite): " + str(automat_dfa))
+
 
 # automat_nfa, stare_initiala, l_finale, l_litere = {0: {'a': {0,1}, 'b': {}}, 1: {'a': {1}, 'b': {1,2}},2: {'a': {1}, 'b': {2}}}, 0, [2], ['a', 'b']
 # conversie_nfa_in_dfa(automat_nfa, stare_initiala,l_finale,l_litere)
+
+automat_dfa, stare_initiala, l_finale, l_litere = {0: {'a': 1,'b':2}, 1: {'a': 0,'b':3}, 2: {'a': 4,'b':5}, 3: {'a': 5,'b':4}, 4: {'a': 4,'b':5}, 5: {'a': 5,'b':6},}, 0, [2,3,4],['a','b']
+
+def deep_copy(automat_dfa):
+    dex = {}
+    while automat_dfa!=dex: # Copiem schita automatului
+        dex = {i:{j:set() for j in automat_dfa[i]} for i in automat_dfa}
+        for i in automat_dfa:
+            for j in automat_dfa[i]:
+                dex[i][j]=automat_dfa[i][j]
+        # dict = automat_dfa
+    return dex
+
+def fct_sucara(automat_dfa, stare_initiala, l_finale_noi):
+    dex_sucar=deep_copy(automat_dfa)
+    for i in dex_sucar:
+        mkay = 1 # Daca nodul nu duce nicaieri si nu e final sau initial, il scoatem din schema
+        for litera in l_litere:
+            if not ( dex_sucar[i][litera]==set() and i not in l_finale_noi and i!=stare_initiala ): # daca nu e ceva din cazurile de mai sus il scotem
+                mkay= 0
+                break
+        if mkay == 1:
+            automat_dfa.pop(i)
+            for fiece_element in automat_dfa:
+                for t in fiece_element:
+                    if automat_dfa[fiece_element][t] == i:
+                        automat_dfa[fiece_element][t] = set()
+
+    for element in dex_sucar:
+        semafor = 0
+        for litera in l_litere:
+            if dex_sucar[element][litera]!=element:
+                semafor = 1
+        if semafor==0:
+            if element not in l_finale_noi:
+                if element != stare_initiala:
+                    automat_dfa.pop(element)
+                    for fiece_element in automat_dfa:
+                        for t in fiece_element:
+                            if automat_dfa[fiece_element][t] == element:
+                                automat_dfa[fiece_element][t] = set()
+    if dex_sucar!=automat_dfa:
+        fct_sucara(automat_dfa, stare_initiala, l_finale_noi)
+    else:
+        return dex_sucar
+
+automat_minimalizat = fct_sucara(automat_dfa, stare_initiala, l_finale)
+print(automat_minimalizat)
+
+def scoatere_stari_neaccesibile(automat_dfa, stare_initiala, l_finale_noi):
+    vizitat=set()
+    dex_sucar_2=deep_copy(automat_dfa)
+    for element in automat_dfa:
+        for litera in l_litere:
+            vizitat.add(automat_dfa[element][litera])
+    for elemente_ver in automat_dfa:
+        if elemente_ver not in vizitat:
+            dex_sucar_2.pop(elemente_ver)
+            for tar in automat_dfa:
+                for litera in l_litere:
+                    if automat_dfa[tar][litera]==elemente_ver:
+                        automat_dfa[tar][litera]=set()
+    return dex_sucar_2
+
+automat_minimalizat = scoatere_stari_neaccesibile(automat_minimalizat, stare_initiala, l_finale
+print(automat_minimalizat)
